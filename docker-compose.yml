@@ -1,0 +1,71 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  scheduler:
+    image: astro-runtime:latest
+    container_name: airflow_scheduler
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW_CONN_POSTGRES_DEFAULT=postgres://postgres:postgres@postgres_db:5432/postgres
+    volumes:
+      - ~/Downloads/ETL/dags:/usr/local/airflow/dags
+      - ~/Downloads/ETL/include:/usr/local/airflow/include
+      - ~/Downloads/ETL/data:/usr/local/airflow/data  # Mounted for raw/clean data
+    networks:
+      - airflow_network
+
+  webserver:
+    image: astro-runtime:latest
+    container_name: airflow_webserver
+    restart: always
+    depends_on:
+      - scheduler
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW_CONN_POSTGRES_DEFAULT=postgres://postgres:postgres@postgres_db:5432/postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - ~/Downloads/ETL/dags:/usr/local/airflow/dags
+      - ~/Downloads/ETL/include:/usr/local/airflow/include
+      - ~/Downloads/ETL/data:/usr/local/airflow/data
+    networks:
+      - airflow_network
+
+  triggerer:
+    image: astro-runtime:latest
+    container_name: airflow_triggerer
+    restart: always
+    depends_on:
+      - scheduler
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW_CONN_POSTGRES_DEFAULT=postgres://postgres:postgres@postgres_db:5432/postgres
+    volumes:
+      - ~/Downloads/ETL/dags:/usr/local/airflow/dags
+      - ~/Downloads/ETL/include:/usr/local/airflow/include
+      - ~/Downloads/ETL/data:/usr/local/airflow/data
+    networks:
+      - airflow_network
+
+networks:
+  airflow_network:
+
+volumes:
+  postgres_data:

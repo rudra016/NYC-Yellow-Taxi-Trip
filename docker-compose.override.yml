@@ -1,0 +1,13 @@
+services:
+  scheduler:
+    environment:
+      - KAGGLE_USERNAME=rudra016
+      - KAGGLE_KEY=21dfb713ade748ab89136b01b429a88c
+  webserver:
+    environment:
+      - KAGGLE_USERNAME=rudra016
+      - KAGGLE_KEY=21dfb713ade748ab89136b01b429a88c
+  triggerer:
+    environment:
+      - KAGGLE_USERNAME=rudra016
+      - KAGGLE_KEY=21dfb713ade748ab89136b01b429a88c
