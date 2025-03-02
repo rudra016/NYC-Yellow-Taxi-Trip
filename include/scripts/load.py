@@ -18,6 +18,33 @@ def load_data_to_postgres(input_path):
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
 
+    # ✅ Ensure table exists before modifying it
+    create_table_query = f"""
+    CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
+        VendorID INTEGER,
+        tpep_pickup_datetime TIMESTAMP,
+        tpep_dropoff_datetime TIMESTAMP,
+        passenger_count INTEGER,
+        trip_distance DOUBLE PRECISION,
+        pickup_longitude DOUBLE PRECISION,
+        pickup_latitude DOUBLE PRECISION,
+        ratecodeid INTEGER,
+        store_and_fwd_flag VARCHAR(10),
+        dropoff_longitude DOUBLE PRECISION,
+        dropoff_latitude DOUBLE PRECISION,
+        payment_type INTEGER,
+        fare_amount DOUBLE PRECISION,
+        extra DOUBLE PRECISION,
+        mta_tax DOUBLE PRECISION,
+        tip_amount DOUBLE PRECISION,
+        tolls_amount DOUBLE PRECISION,
+        improvement_surcharge DOUBLE PRECISION,
+        total_amount DOUBLE PRECISION
+    );
+    """
+    cursor.execute(create_table_query)
+    conn.commit()
+
     # ✅ Alter table to add missing columns if they don't exist
     alter_table_query = f"""
     ALTER TABLE {TABLE_NAME} 
