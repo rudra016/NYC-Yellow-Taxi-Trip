@@ -7,7 +7,7 @@ DB_CONFIG = {
     'dbname': 'postgres',
     'user': 'postgres',
     'password': 'postgres',
-    'host': 'etl_e6515f-postgres-1',  # Use Docker service name
+    'host': 'etl_e6515f-postgres-1',  
     'port': '5432'
 }
 
@@ -18,7 +18,7 @@ def load_data_to_postgres(input_path):
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
 
-    # ✅ Ensure table exists before modifying it
+    # Ensure table exists before modifying it
     create_table_query = f"""
     CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
         VendorID INTEGER,
@@ -62,10 +62,10 @@ def load_data_to_postgres(input_path):
             df_iter = pd.read_csv(file_path, chunksize=50000)
 
             for chunk in df_iter:
-                # ✅ Rename columns to match PostgreSQL table (fix case issues)
+               
                 chunk.columns = chunk.columns.str.lower()
 
-                # ✅ Ensure the column order exactly matches PostgreSQL table
+               
                 expected_columns = [
                     'vendorid', 'tpep_pickup_datetime', 'tpep_dropoff_datetime',
                     'passenger_count', 'trip_distance', 'pickup_longitude', 'pickup_latitude',
@@ -80,7 +80,7 @@ def load_data_to_postgres(input_path):
                         chunk[col] = None  
 
                 chunk = chunk[expected_columns]
-                # ✅ Convert DataFrame to list of tuples for batch insert
+                # Convert DataFrame to list of tuples for batch insert
                 records_list = list(chunk.itertuples(index=False, name=None))
 
                 insert_query = f"""

@@ -24,8 +24,8 @@ def clean_data(input_path, output_path):
                 # ✅ Remove rows with invalid `passenger_count`
                 chunk = chunk[chunk['passenger_count'] >= 1]
 
-                # ✅ Convert `store_and_fwd_flag` to standardized values ('Y' or 'N')
-                chunk['store_and_fwd_flag'] = chunk['store_and_fwd_flag'].map(lambda x: 'Y' if x in ['Y', 'y'] else 'N')
+                # ✅ Convert `store_and_fwd_flag` to standardized values ('1' or '0')
+                chunk['store_and_fwd_flag'] = (chunk['store_and_fwd_flag'] == 'Y').astype(int)
 
                 # ✅ Convert timestamps to proper datetime format
                 chunk['tpep_pickup_datetime'] = pd.to_datetime(chunk['tpep_pickup_datetime'], errors='coerce')
